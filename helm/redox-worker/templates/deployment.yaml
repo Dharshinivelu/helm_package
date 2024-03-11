@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: push-notification-worker-prod
-  namespace: push-notification-worker-prod
+  name: redox-worker-stage
+  namespace: redox-worker-stage
   labels:
-    app: push-notification-worker-prod
+    app: redox-worker-stage
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: push-notification-worker-prod
+      app: redox-worker-stage
   template:
     metadata:
       labels:
-        app: push-notification-worker-prod
+        app: redox-worker-stage
     spec:
       containers:
-        - name: push-notification-worker-prod
-          image: cooeyhub.azurecr.io/push-notification-worker:5546
+        - name: redox-worker-stage
+          image: cooeyhub.azurecr.io/redox_worker:5574
           imagePullPolicy: "Always"
           args: []
           env:
@@ -36,11 +36,11 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: push-notification-worker-prod-hpa
+  name: redox-worker-stage-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1 
-    name: push-notification-worker-prod
+    name: redox-worker-stage
     kind: Deployment 
   minReplicas: 1
   maxReplicas: 3
