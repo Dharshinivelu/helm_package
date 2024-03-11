@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: device-measurement-worker
+  namespace: device-measurement-worker-stage
+  labels:
+    app: device-measurement-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: device-measurement-worker
+  template:
+    metadata:
+      labels:
+        app: device-measurement-worker
+    spec:
+      containers:
+        - name: device-measurement-worker
+          image: cooeyhub.azurecr.io/device-measurements-worker:5522
+          imagePullPolicy: "Always"
+          args: []
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "stage"
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: 2Gi
+              cpu: 200m
+            limits:
+              memory: 2Gi
+              cpu: 400m
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: device-measurement-worker-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1 
+    name: device-measurement-worker
+    kind: Deployment 
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 75
+---
