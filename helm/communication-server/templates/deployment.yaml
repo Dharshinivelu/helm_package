@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: communications-server-prod
+  namespace: communications-server-prod
+  labels:
+    app: communications-server-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: communications-server-prod
+  template:
+    metadata:
+      labels:
+        app: communications-server-prod
+    spec:
+      containers:
+        - name: communications-server-prod
+          image: cooeyhub.azurecr.io/communications-server-prod:5549
+          imagePullPolicy: "Always"
+          args: []
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "stage"
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: 2Gi
+              cpu: 200m
+            limits:
+              memory: 4Gi
+              cpu: 400m
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: communications-server-prod
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1 
+    name: communications-server-prod
+    kind: Deployment 
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 75
+---
