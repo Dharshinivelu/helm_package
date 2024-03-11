@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: push-notification-worker-prod
+  namespace: push-notification-worker-prod
+  labels:
+    app: push-notification-worker-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: push-notification-worker-prod
+  template:
+    metadata:
+      labels:
+        app: push-notification-worker-prod
+    spec:
+      containers:
+        - name: push-notification-worker-prod
+          image: cooeyhub.azurecr.io/push-notification-worker:#{Build.BuildId}#
+          imagePullPolicy: "Always"
+          args: []
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "stage"
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: 2Gi
+              cpu: 200m
+            limits:
+              memory: 2Gi
+              cpu: 400m
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: push-notification-worker-prod-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1 
+    name: push-notification-worker-prod
+    kind: Deployment 
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 75
+---
