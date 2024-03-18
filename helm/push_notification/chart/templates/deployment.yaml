@@ -15,8 +15,11 @@ spec:
       labels:
         app: push-notification-worker-prod
     spec:
+      imagePullSecrets:
+      - name: registrysecret
+      serviceAccountName: push-sa
       containers:
-        - name: push-notification-worker-prod
+        - name: pushnotificationworkerprod
           image: cooeyhub.azurecr.io/push-notification-worker:5546
           imagePullPolicy: "Always"
           args: []
@@ -27,10 +30,10 @@ spec:
             - containerPort: 80
           resources:
             requests:
-              memory: 2Gi
+              memory: 500Mi
               cpu: 200m
             limits:
-              memory: 2Gi
+              memory: 500Mi
               cpu: 400m
 ---
 apiVersion: autoscaling/v2
@@ -52,3 +55,4 @@ spec:
         type: Utilization
         averageUtilization: 75
 ---
+

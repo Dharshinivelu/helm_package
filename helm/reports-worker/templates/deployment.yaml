@@ -15,8 +15,11 @@ spec:
       labels:
         app: reports-worker-stage
     spec:
+      imagePullSecrets:
+      - name: registrysecret
+      serviceAccountName: report-sa
       containers:
-        - name: reports-worker-stage
+        - name: reportsworkerstage
           image: cooeyhub.azurecr.io/reports-worker:5521
           imagePullPolicy: "Always"
           args: []
@@ -26,11 +29,11 @@ spec:
           ports:
             - containerPort: 80
           resources:
-            requests
-              memory: 2Gi
+            requests:
+              memory: 500Mi
               cpu: 200m
             limits:
-              memory: 2Gi
+              memory: 500Mi
               cpu: 400m
 ---
 apiVersion: autoscaling/v2
