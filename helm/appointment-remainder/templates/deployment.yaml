@@ -15,22 +15,25 @@ spec:
       labels:
         app: appointment-reminder-worker-stage
     spec:
+      imagePullSecrets:
+      - name: registrysecret
+      serviceAccountName: appointment-sa
       containers:
-        - name: appointment-reminder-worker-stage
+        - name: appointmentreminder
           image: cooeyhub.azurecr.io/appointment-reminder-worker:5517
           imagePullPolicy: "Always"
           args: []
-          env:
+          env:  
             - name: SPRING_PROFILES_ACTIVE
               value: "stage"
           ports:
             - containerPort: 80
           resources:
             requests:
-              memory: 2Gi
+              memory: 500Mi
               cpu: 200m
             limits:
-              memory: 2Gi
+              memory: 500Mi
               cpu: 400m
 ---
 apiVersion: autoscaling/v2
@@ -52,3 +55,4 @@ spec:
         type: Utilization
         averageUtilization: 75
 ---
+

@@ -15,9 +15,12 @@ spec:
       labels:
         app: communications-server-prod
     spec:
+      imagePullSecrets:
+      - name: registrysecret
+      #serviceAccountName: communications-server-sa
       containers:
-        - name: communications-server-prod
-          image: cooeyhub.azurecr.io/communications-server-prod:5549
+        - name: communicationsserverprod
+          image: cooeyhub.azurecr.io/communications-server:5549
           imagePullPolicy: "Always"
           args: []
           env:
@@ -27,10 +30,10 @@ spec:
             - containerPort: 80
           resources:
             requests:
-              memory: 2Gi
+              memory: 500Mi
               cpu: 200m
             limits:
-              memory: 4Gi
+              memory: 500Mi
               cpu: 400m
 ---
 apiVersion: autoscaling/v2

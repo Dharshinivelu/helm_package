@@ -15,8 +15,11 @@ spec:
       labels:
         app: device-measurement-worker
     spec:
+      imagePullSecrets:
+      - name: registrysecret
+      serviceAccountName: device-sa
       containers:
-        - name: device-measurement-worker
+        - name: devicemeasurementworker
           image: cooeyhub.azurecr.io/device-measurements-worker:5522
           imagePullPolicy: "Always"
           args: []
@@ -27,10 +30,10 @@ spec:
             - containerPort: 80
           resources:
             requests:
-              memory: 2Gi
+              memory: 500Mi
               cpu: 200m
             limits:
-              memory: 2Gi
+              memory: 500Mi
               cpu: 400m
 ---
 apiVersion: autoscaling/v2
@@ -52,3 +55,4 @@ spec:
         type: Utilization
         averageUtilization: 75
 ---
+
