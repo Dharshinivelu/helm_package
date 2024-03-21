@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: episodes-scheduler-stage
+  namespace: episodes-scheduler-stage
+spec:
+  schedule: "0 */6 * * *"
+  successfulJobsHistoryLimit: {{ .Values.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.failedJobsHistoryLimit }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          imagePullSecrets:
+          - name: registrysecret
+          serviceAccountName: episodes-scheduler-sa
+          containers:
+            - name: episodes-scheduler-stage
+              image: "cooeyhub.azurecr.io/episodes-scheduler:5523"
+              imagePullPolicy: "Always"
+              args: []
+              env:
+                - name: SPRING_PROFILES_ACTIVE
+                  value: "stage"
+              ports:
+                - containerPort: 80
+              resources:
+                requests:
+                  memory: {{ .Values.requestMemory }}
+                  cpu: {{ .Values.requestCPU }}
+                limits:
+                  memory: {{ .Values.limitMemory }}
+                  cpu: {{ .Values.limitCPU }}
+          restartPolicy: OnFailure
+          terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+          activeDeadlineSeconds: {{ .Values.activeDeadlineSeconds }}
+      backoffLimit: {{ .Values.backoffLimit }}

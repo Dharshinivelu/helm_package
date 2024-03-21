@@ -2,6 +2,14 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+limitCPU: "400m"
+limitMemory: "2Gi"
+maxReplicas: 3
+minReplicas: 1
+replicas: 1
+requestCPU: "200m"
+requestMemory: "2Gi"
+
 replicaCount: 1
 
 image:

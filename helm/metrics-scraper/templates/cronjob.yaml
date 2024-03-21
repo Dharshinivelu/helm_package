@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: metrics-scraper-dev
+  namespace: metrics-scraper-dev
+spec:
+  schedule: "0 */6 * * *"
+  successfulJobsHistoryLimit: {{ .Values.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.failedJobsHistoryLimit }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          imagePullSecrets:
+          - name: registrysecret
+          serviceAccountName: metrics-scraper-sa
+          containers:
+            - name: metrics-scraper-dev
+              image: "cooeyhub.azurecr.io/metrics_scraper:5676"
+              imagePullPolicy: "Always"
+              args: []
+              env:
+                - name: SPRING_PROFILES_ACTIVE
+                  value: "stage"
+              ports:
+                - containerPort: 80
+              resources:
+                requests:
+                  memory: {{ .Values.requestMemory }}
+                  cpu: {{ .Values.requestCPU }}
+                limits:
+                  memory: {{ .Values.limitMemory }}
+                  cpu: {{ .Values.limitCPU }}
+          restartPolicy: OnFailure
+          terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+          activeDeadlineSeconds: {{ .Values.activeDeadlineSeconds }}
+      backoffLimit: {{ .Values.backoffLimit }}

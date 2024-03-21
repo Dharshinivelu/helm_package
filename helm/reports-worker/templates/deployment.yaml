@@ -6,7 +6,7 @@ metadata:
   labels:
     app: reports-worker-stage
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       app: reports-worker-stage
@@ -30,11 +30,11 @@ spec:
             - containerPort: 80
           resources:
             requests:
-              memory: 500Mi
-              cpu: 200m
+              memory: {{ .Values.requestMemory }}
+              cpu: {{ .Values.requestCPU }}
             limits:
-              memory: 500Mi
-              cpu: 400m
+              memory: {{ .Values.limitMemory }}
+              cpu: {{ .Values.limitCPU }}
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -43,10 +43,10 @@ metadata:
 spec:
   scaleTargetRef:
     apiVersion: apps/v1 
-    name: redox-worker-stage
+    name: reports-worker-stage
     kind: Deployment 
-  minReplicas: 1
-  maxReplicas: 3
+  minReplicas: {{ .Values.minReplicas }}
+  maxReplicas: {{ .Values.maxReplicas }}
   metrics:
   - type: Resource
     resource:

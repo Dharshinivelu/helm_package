@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: forms-scheduler-dev
+  namespace: forms-scheduler-dev
+spec:
+  schedule: "0 */6 * * *"
+  successfulJobsHistoryLimit: {{ .Values.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.failedJobsHistoryLimit }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          imagePullSecrets:
+          - name: registrysecret
+          serviceAccountName: forms-scheduler-dev
+          containers:
+            - name: forms-scheduler-dev
+              image: "cooeyhub.azurecr.io/forms_scheduler:latest"
+              imagePullPolicy: "Always"
+              args: []
+              env:
+                - name: SPRING_PROFILES_ACTIVE
+                  value: "stage"
+              ports:
+                - containerPort: 80
+              resources:
+                requests:
+                  memory: {{ .Values.requestMemory }}
+                  cpu: {{ .Values.requestCPU }}
+                limits:
+                  memory: {{ .Values.limitMemory }}
+                  cpu: {{ .Values.limitCPU }}
+          restartPolicy: OnFailure
+          terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+          activeDeadlineSeconds: {{ .Values.activeDeadlineSeconds }}
+      backoffLimit: {{ .Values.backoffLimit }}

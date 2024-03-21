@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sms-worker-dev
+  namespace: sms-worker-dev
+spec:
+  schedule: "0 */6 * * *"
+  successfulJobsHistoryLimit: {{ .Values.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.failedJobsHistoryLimit }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          imagePullSecrets:
+          - name: registrysecret
+          serviceAccountName: sms-worker-sa
+          containers:
+            - name: sms-worker-dev
+              image: "cooeyhub.azurecr.io/sms_worker:5547"
+              imagePullPolicy: "Always"
+              args: []
+              env:
+                - name: SPRING_PROFILES_ACTIVE
+                  value: "stage"
+              ports:
+                - containerPort: 80
+              resources:
+                requests:
+                  memory: {{ .Values.requestMemory }}
+                  cpu: {{ .Values.requestCPU }}
+                limits:
+                  memory: {{ .Values.limitMemory }}
+                  cpu: {{ .Values.limitCPU }}
+          restartPolicy: OnFailure
+          terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+          activeDeadlineSeconds: {{ .Values.activeDeadlineSeconds }}
+      backoffLimit: {{ .Values.backoffLimit }}

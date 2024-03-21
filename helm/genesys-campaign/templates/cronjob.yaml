@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: genesys-campaign-contact-worker-dev
+  namespace: genesys-campaign-contact-worker-dev
+spec:
+  schedule: "0 */6 * * *"
+  successfulJobsHistoryLimit: {{ .Values.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.failedJobsHistoryLimit }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          imagePullSecrets:
+          - name: registrysecret
+          serviceAccountName: genesys-campaign-sa
+          containers:
+            - name: genesys-campaign-contact-worker-dev
+              image: "cooeyhub.azurecr.io/genesys_campaign_contact_worker:5694"
+              imagePullPolicy: "Always"
+              args: []
+              env:
+                - name: SPRING_PROFILES_ACTIVE
+                  value: "stage"
+              ports:
+                - containerPort: 80
+              resources:
+                requests:
+                  memory: {{ .Values.requestMemory }}
+                  cpu: {{ .Values.requestCPU }}
+                limits:
+                  memory: {{ .Values.limitMemory }}
+                  cpu: {{ .Values.limitCPU }}
+          restartPolicy: OnFailure
+          terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+          activeDeadlineSeconds: {{ .Values.activeDeadlineSeconds }}
+      backoffLimit: {{ .Values.backoffLimit }}
